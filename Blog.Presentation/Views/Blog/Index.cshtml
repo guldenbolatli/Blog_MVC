@@ -1,0 +1,40 @@
+﻿@using Blog.Application.Models.VMs;
+@using Blog.Domain.Entities.Concrete;
+@using Microsoft.AspNetCore.Identity;
+@model IEnumerable<PostVM>
+@inject SignInManager<AppUser> _signInManager
+
+    <script>
+        function areYouSure()
+        {
+            return confirm("İlgili Post'un silinmesini istiyor musunuz?");
+
+        }
+    </script>
+@{
+    var IsSigned = _signInManager.IsSignedIn(User);
+    var IsAdmin = User.IsInRole("Admin");
+    var userName = User.Identity.Name;
+}
+
+<table class="table table-striped">
+    @foreach(var post in Model)
+    {
+        <tr>
+            <td>@post.Title</td>
+            <td>@post.CreateDate</td>
+            <td>@post.UserName</td>
+            <td>
+                @if (IsSigned && post.UserName == userName)
+                {
+                  <a class="btn btn-secondary">Update</a>
+                }
+                @if (IsSigned && IsAdmin)
+                {
+                    <a class="btn btn-danger" asp-area="AdminPanel" asp-controller="Panel" asp-action="DeletePost" asp-route-id="@post.Id" onclick="return areYouSure()">Delete</a>
+                }
+            </td>
+        </tr>
+  
+    }
+</table>
